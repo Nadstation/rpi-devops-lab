@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevLab Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        h1 { margin-bottom: 20px; color: #00d4ff; }
+        #chat-box { width: 700px; height: 500px; background: #16213e; border-radius: 10px; padding: 20px; overflow-y: auto; margin-bottom: 20px; }
+        .message { margin-bottom: 15px; }
+        .user { text-align: right; }
+        .user span { background: #0f3460; padding: 10px 15px; border-radius: 15px; display: inline-block; max-width: 80%; }
+        .bot span { background: #00d4ff; color: #1a1a2e; padding: 10px 15px; border-radius: 15px; display: inline-block; max-width: 80%; }
+        #input-area { display: flex; width: 700px; gap: 10px; }
+        #user-input { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #16213e; color: #eee; font-size: 16px; }
+        #send-btn { padding: 12px 24px; background: #00d4ff; color: #1a1a2e; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        #send-btn:hover { background: #00b4d8; }
+        .thinking { color: #888; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Nadu's AI Chat</h1>
+    <div id="chat-box"></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-btn">Send</button>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+
+        function appendMessage(text, sender) {
+            const div = document.createElement("div");
+            div.classList.add("message", sender);
+            div.innerHTML = `<span>${text}</span>`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            appendMessage(message, "user");
+            userInput.value = "";
+            appendMessage("Thinking...", "bot");
+
+            try {
+                const response = await fetch("http://localhost:8000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                chatBox.lastChild.remove();
+                appendMessage(data.reply, "bot");
+            } catch (error) {
+                chatBox.lastChild.remove();
+                appendMessage("Error connecting to API", "bot");
+            }
+        }
+
+        sendBtn.addEventListener("click", sendMessage);
+        userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+    </script>
+</body>
+</html>
