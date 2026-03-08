@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: rpi-devops-lab-backend:latest
-          imagePullPolicy: Never
+          image: ghcr.io/nadstation/rpi-devops-lab-backend:latest
+          imagePullPolicy: Always
           env:
             - name: DB_HOST
               value: mariadb
