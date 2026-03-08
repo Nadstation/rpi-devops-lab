@@ -16,7 +16,7 @@ def get_db():
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/":
-            response = {"message": "DevLab API is running!"}
+            response = {"message": "DevLab API is running! V2.0"}
         elif self.path == "/health":
             try:
                 conn = get_db()
